@@ -1,0 +1,6 @@
+@GoCourier.Api_HostAddress = http://localhost:5248
+
+GET {{GoCourier.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
