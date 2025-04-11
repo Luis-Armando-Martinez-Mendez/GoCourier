@@ -141,7 +141,9 @@ namespace GoCourier.Web.Controllers
             }
 
             var notificacion = await _context.Notificaciones
+                .Include(n => n.Usuario)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (notificacion == null)
             {
                 return NotFound();
@@ -149,6 +151,7 @@ namespace GoCourier.Web.Controllers
 
             return View(notificacion);
         }
+
 
         // POST: Notificacion/Delete/5
         [HttpPost, ActionName("Delete")]

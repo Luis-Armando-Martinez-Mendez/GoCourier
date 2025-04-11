@@ -128,6 +128,7 @@ namespace GoCourier.Web.Controllers
         }
 
         // GET: Envio/Delete/5
+        // GET: Envio/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -136,7 +137,9 @@ namespace GoCourier.Web.Controllers
             }
 
             var envio = await _context.Envios
+                .Include(e => e.Usuario) // Incluye el usuario para acceder a su Email
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (envio == null)
             {
                 return NotFound();
@@ -144,6 +147,7 @@ namespace GoCourier.Web.Controllers
 
             return View(envio);
         }
+
 
         // POST: Envio/Delete/5
         [HttpPost, ActionName("Delete")]
