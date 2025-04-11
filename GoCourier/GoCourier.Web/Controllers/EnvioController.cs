@@ -39,7 +39,9 @@ namespace GoCourier.Web.Controllers
             }
 
             var envio = await _context.Envios
+                .Include(e => e.Usuario) 
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (envio == null)
             {
                 return NotFound();
@@ -47,6 +49,7 @@ namespace GoCourier.Web.Controllers
 
             return View(envio);
         }
+
 
         // GET: Envio/Create
         public IActionResult Create()

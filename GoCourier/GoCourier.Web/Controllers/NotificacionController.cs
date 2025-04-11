@@ -22,8 +22,13 @@ namespace GoCourier.Web.Controllers
         // GET: Notificacion
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Notificaciones.ToListAsync());
+            var notificaciones = await _context.Notificaciones
+                .Include(n => n.Usuario) 
+                .ToListAsync();
+
+            return View(notificaciones);
         }
+
 
         // GET: Notificacion/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -34,7 +39,9 @@ namespace GoCourier.Web.Controllers
             }
 
             var notificacion = await _context.Notificaciones
+                .Include(n => n.Usuario) 
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (notificacion == null)
             {
                 return NotFound();
@@ -46,8 +53,10 @@ namespace GoCourier.Web.Controllers
         // GET: Notificacion/Create
         public IActionResult Create()
         {
+            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email");
             return View();
         }
+
 
         // POST: Notificacion/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -62,8 +71,11 @@ namespace GoCourier.Web.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", notificacion.UsuarioId);
             return View(notificacion);
         }
+
 
         // GET: Notificacion/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -78,8 +90,11 @@ namespace GoCourier.Web.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", notificacion.UsuarioId);
             return View(notificacion);
         }
+
 
         // POST: Notificacion/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -113,9 +128,10 @@ namespace GoCourier.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", notificacion.UsuarioId);
             return View(notificacion);
         }
-
         // GET: Notificacion/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
