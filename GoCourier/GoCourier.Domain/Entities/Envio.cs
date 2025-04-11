@@ -14,6 +14,7 @@ namespace GoCourier.Domain.Entities
         public string Descripcion { get; set; } = string.Empty;
         public string Estado { get; set; } = string.Empty;
         public DateTime Fecha { get; set; } = DateTime.Now;
+        public Usuario? Usuario { get; set; }
     }
 }
 

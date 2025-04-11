@@ -22,8 +22,13 @@ namespace GoCourier.Web.Controllers
         // GET: Envio
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Envios.ToListAsync());
+            var envios = await _context.Envios
+                .Include(e => e.Usuario)
+                .ToListAsync();
+            return View(envios);
         }
+
+
 
         // GET: Envio/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -46,12 +51,11 @@ namespace GoCourier.Web.Controllers
         // GET: Envio/Create
         public IActionResult Create()
         {
+            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email");
             return View();
         }
 
         // POST: Envio/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,UsuarioId,Direccion,Descripcion,Estado,Fecha")] Envio envio)
@@ -62,6 +66,8 @@ namespace GoCourier.Web.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", envio.UsuarioId);
             return View(envio);
         }
 
@@ -78,12 +84,12 @@ namespace GoCourier.Web.Controllers
             {
                 return NotFound();
             }
+
+            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", envio.UsuarioId);
             return View(envio);
         }
 
         // POST: Envio/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,UsuarioId,Direccion,Descripcion,Estado,Fecha")] Envio envio)
@@ -113,6 +119,8 @@ namespace GoCourier.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", envio.UsuarioId);
             return View(envio);
         }
 
