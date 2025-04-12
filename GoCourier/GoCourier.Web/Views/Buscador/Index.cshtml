@@ -1,0 +1,43 @@
+﻿@model List<GoCourier.Domain.Entities.Envio>
+
+@{
+    ViewData["Title"] = "Buscar Envíos";
+}
+
+<h1>Buscar Envíos por Email de Usuario</h1>
+
+<form method="get">
+    <input type="text" name="email" placeholder="Buscar por email..." class="form-control mb-3" value="@ViewData["Email"]" />
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
+@if (Model.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Dirección</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var envio in Model)
+            {
+                <tr>
+                    <td>@envio.Usuario?.Email</td>
+                    <td>@envio.Direccion</td>
+                    <td>@envio.Descripcion</td>
+                    <td>@envio.Estado</td>
+                    <td>@envio.Fecha.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No se encontraron envíos.</p>
+}
