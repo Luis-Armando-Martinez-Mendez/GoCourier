@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GoCourier.Application\GoCourier.Application.csproj" />
     <ProjectReference Include="..\GoCourier.Domain\GoCourier.Domain.csproj" />
     <ProjectReference Include="..\GoCourier.Infrastruture\GoCourier.Infrastruture.csproj" />
   </ItemGroup>
