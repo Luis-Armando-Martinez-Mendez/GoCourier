@@ -4,40 +4,61 @@
     ViewData["Title"] = "Buscar Envíos";
 }
 
-<h1>Buscar Envíos por Email de Usuario</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-search"></i> Buscar Envíos por Email de Usuario
+        </h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Volver a la lista
+        </a>
+    </div>
 
-<form method="get">
-    <input type="text" name="email" placeholder="Buscar por email..." class="form-control mb-3" value="@ViewData["Email"]" />
-    <button type="submit" class="btn btn-primary">Buscar</button>
-</form>
+    <div class="card shadow-sm rounded">
+        <div class="card-body">
+            <form method="get">
+                <div class="input-group mb-3">
+                    <input type="text" name="email" placeholder="Buscar por email..." class="form-control" value="@ViewData["Email"]" />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-@if (Model.Count > 0)
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                <th>Dirección</th>
-                <th>Descripción</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var envio in Model)
-            {
-                <tr>
-                    <td>@envio.Usuario?.Email</td>
-                    <td>@envio.Direccion</td>
-                    <td>@envio.Descripcion</td>
-                    <td>@envio.Estado</td>
-                    <td>@envio.Fecha.ToShortDateString()</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No se encontraron envíos.</p>
-}
+    @if (Model.Count > 0)
+    {
+        <div class="table-responsive shadow-sm rounded mt-4">
+            <table class="table table-hover align-middle bg-white">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Dirección</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var envio in Model)
+                    {
+                        <tr>
+                            <td>@envio.Usuario?.Email</td>
+                            <td>@envio.Direccion</td>
+                            <td>@envio.Descripcion</td>
+                            <td>@envio.Estado</td>
+                            <td>@envio.Fecha.ToShortDateString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mt-3" role="alert">
+            <i class="bi bi-exclamation-circle"></i> No se encontraron envíos.
+        </div>
+    }
+</div>
