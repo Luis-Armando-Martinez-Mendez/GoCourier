@@ -26,6 +26,6 @@ public class BuscadorController : Controller
 
         var resultados = await query.ToListAsync();
 
-        return View(resultados); 
+        return View(resultados);
     }
 }
