@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GoCourier.Domain\GoCourier.Domain.csproj" />
+    <ProjectReference Include="..\GoCourier.Infrastruture\GoCourier.Infrastruture.csproj" />
   </ItemGroup>
 
 </Project>

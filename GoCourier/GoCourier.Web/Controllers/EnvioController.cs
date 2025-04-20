@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GoCourier.Domain.Entities;
 using GoCourier.infrastructure.Context;
 
 namespace GoCourier.Web.Controllers
 {
-    public class EnvioController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EnvioController : ControllerBase
     {
         private readonly GoCourierContext _context;
 
@@ -19,154 +19,80 @@ namespace GoCourier.Web.Controllers
             _context = context;
         }
 
-        // GET: Envio
-        public async Task<IActionResult> Index()
+        // GET: api/envio
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Envio>>> GetEnvios()
         {
-            var envios = await _context.Envios
-                .Include(e => e.Usuario)
-                .ToListAsync();
-            return View(envios);
+            var envios = await _context.Envios.Include(e => e.Usuario).ToListAsync();
+            return Ok(envios);
         }
 
-
-
-        // GET: Envio/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/envio/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Envio>> GetEnvio(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var envio = await _context.Envios
-                .Include(e => e.Usuario) 
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var envio = await _context.Envios.Include(e => e.Usuario).FirstOrDefaultAsync(m => m.Id == id);
 
             if (envio == null)
             {
                 return NotFound();
             }
 
-            return View(envio);
+            return Ok(envio);
         }
 
-
-        // GET: Envio/Create
-        public IActionResult Create()
-        {
-            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email");
-            return View();
-        }
-
-        // POST: Envio/Create
+        // POST: api/envio
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UsuarioId,Direccion,Descripcion,Estado,Fecha")] Envio envio)
+        public async Task<ActionResult<Envio>> CreateEnvio([FromBody] Envio envio)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(envio);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+            _context.Envios.Add(envio);
+            await _context.SaveChangesAsync();
 
-            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", envio.UsuarioId);
-            return View(envio);
+            return CreatedAtAction(nameof(GetEnvio), new { id = envio.Id }, envio);
         }
 
-        // GET: Envio/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var envio = await _context.Envios.FindAsync(id);
-            if (envio == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", envio.UsuarioId);
-            return View(envio);
-        }
-
-        // POST: Envio/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UsuarioId,Direccion,Descripcion,Estado,Fecha")] Envio envio)
+        // PUT: api/envio/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateEnvio(int id, [FromBody] Envio envio)
         {
             if (id != envio.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            _context.Entry(envio).State = EntityState.Modified;
+
+            try
             {
-                try
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Envios.Any(e => e.Id == id))
                 {
-                    _context.Update(envio);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EnvioExists(envio.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+
+                throw;
             }
 
-            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", envio.UsuarioId);
-            return View(envio);
+            return NoContent();
         }
 
-        // GET: Envio/Delete/5
-        // GET: Envio/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // DELETE: api/envio/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEnvio(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var envio = await _context.Envios
-                .Include(e => e.Usuario) // Incluye el usuario para acceder a su Email
-                .FirstOrDefaultAsync(m => m.Id == id);
-
+            var envio = await _context.Envios.FindAsync(id);
             if (envio == null)
             {
                 return NotFound();
             }
 
-            return View(envio);
-        }
-
-
-        // POST: Envio/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var envio = await _context.Envios.FindAsync(id);
-            if (envio != null)
-            {
-                _context.Envios.Remove(envio);
-            }
-
+            _context.Envios.Remove(envio);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
-        private bool EnvioExists(int id)
-        {
-            return _context.Envios.Any(e => e.Id == id);
+            return NoContent();
         }
     }
 }

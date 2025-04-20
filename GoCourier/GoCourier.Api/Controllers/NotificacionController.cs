@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using GoCourier.Domain.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using GoCourier.Api.Dtos;
 using GoCourier.infrastructure.Context;
+using GoCourier.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace GoCourier.Web.Controllers
+namespace GoCourier.Api.Controllers
 {
-    public class NotificacionController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class NotificacionController : ControllerBase
     {
         private readonly GoCourierContext _context;
 
@@ -19,158 +17,109 @@ namespace GoCourier.Web.Controllers
             _context = context;
         }
 
-        // GET: Notificacion
-        public async Task<IActionResult> Index()
+        // GET: api/Notificacion
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<NotificacionDto>>> GetNotificaciones()
         {
             var notificaciones = await _context.Notificaciones
-                .Include(n => n.Usuario) 
+                .Include(n => n.Usuario)
+                .Select(n => new NotificacionDto
+                {
+                    Id = n.Id,
+                    UsuarioId = n.UsuarioId,
+                    Mensaje = n.Mensaje,
+                    Fecha = n.Fecha,
+                    Usuario = n.Usuario != null ? new UsuarioDto
+                    {
+                        Id = n.Usuario.Id,
+                        Nombre = n.Usuario.Nombre,
+                        Email = n.Usuario.Email
+                    } : null
+                })
                 .ToListAsync();
 
-            return View(notificaciones);
+            return Ok(notificaciones);
         }
 
-
-        // GET: Notificacion/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: api/Notificacion/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<NotificacionDto>> GetNotificacion(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var notificacion = await _context.Notificaciones
-                .Include(n => n.Usuario) 
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (notificacion == null)
-            {
-                return NotFound();
-            }
-
-            return View(notificacion);
-        }
-
-        // GET: Notificacion/Create
-        public IActionResult Create()
-        {
-            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email");
-            return View();
-        }
-
-
-        // POST: Notificacion/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UsuarioId,Mensaje,Fecha")] Notificacion notificacion)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(notificacion);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", notificacion.UsuarioId);
-            return View(notificacion);
-        }
-
-
-        // GET: Notificacion/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var notificacion = await _context.Notificaciones.FindAsync(id);
-            if (notificacion == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", notificacion.UsuarioId);
-            return View(notificacion);
-        }
-
-
-        // POST: Notificacion/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UsuarioId,Mensaje,Fecha")] Notificacion notificacion)
-        {
-            if (id != notificacion.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(notificacion);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NotificacionExists(notificacion.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.Usuarios = new SelectList(_context.Usuarios, "Id", "Email", notificacion.UsuarioId);
-            return View(notificacion);
-        }
-        // GET: Notificacion/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var notificacion = await _context.Notificaciones
                 .Include(n => n.Usuario)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Where(n => n.Id == id)
+                .Select(n => new NotificacionDto
+                {
+                    Id = n.Id,
+                    UsuarioId = n.UsuarioId,
+                    Mensaje = n.Mensaje,
+                    Fecha = n.Fecha,
+                    Usuario = n.Usuario != null ? new UsuarioDto
+                    {
+                        Id = n.Usuario.Id,
+                        Nombre = n.Usuario.Nombre,
+                        Email = n.Usuario.Email
+                    } : null
+                })
+                .FirstOrDefaultAsync();
 
             if (notificacion == null)
-            {
                 return NotFound();
-            }
 
-            return View(notificacion);
+            return Ok(notificacion);
         }
 
+        // POST: api/Notificacion
+        [HttpPost]
+        public async Task<ActionResult<NotificacionDto>> CreateNotificacion(NotificacionDto dto)
+        {
+            var notificacion = new Notificacion
+            {
+                UsuarioId = dto.UsuarioId,
+                Mensaje = dto.Mensaje,
+                Fecha = dto.Fecha
+            };
 
-        // POST: Notificacion/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+            _context.Notificaciones.Add(notificacion);
+            await _context.SaveChangesAsync();
+
+            dto.Id = notificacion.Id;
+
+            return CreatedAtAction(nameof(GetNotificacion), new { id = dto.Id }, dto);
+        }
+
+        // PUT: api/Notificacion/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateNotificacion(int id, NotificacionDto dto)
+        {
+            if (id != dto.Id)
+                return BadRequest();
+
+            var notificacion = await _context.Notificaciones.FindAsync(id);
+            if (notificacion == null)
+                return NotFound();
+
+            notificacion.Mensaje = dto.Mensaje;
+            notificacion.Fecha = dto.Fecha;
+
+            _context.Entry(notificacion).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // DELETE: api/Notificacion/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteNotificacion(int id)
         {
             var notificacion = await _context.Notificaciones.FindAsync(id);
-            if (notificacion != null)
-            {
-                _context.Notificaciones.Remove(notificacion);
-            }
+            if (notificacion == null)
+                return NotFound();
 
+            _context.Notificaciones.Remove(notificacion);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
-        private bool NotificacionExists(int id)
-        {
-            return _context.Notificaciones.Any(e => e.Id == id);
+            return NoContent();
         }
     }
 }

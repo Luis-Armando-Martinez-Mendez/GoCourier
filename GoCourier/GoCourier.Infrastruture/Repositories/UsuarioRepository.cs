@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GoCourier.Application.Services
+namespace GoCourier.Infrastruture.Repositories
 {
-    internal class Notificacion
+    internal class UsuarioRepository
     {
     }
 }

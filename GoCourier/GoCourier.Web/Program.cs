@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddDbContext<GoCourierContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("GoCourierStrConnection") ?? throw new InvalidOperationException("Connection string 'GoCourier' not found.")));
+// Add services to the container
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
